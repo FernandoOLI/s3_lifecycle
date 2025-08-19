@@ -14,7 +14,11 @@ license = { text = "MIT" }
 requires-python = ">=3.9"
 
 # Keep dependencies empty — will be loaded dynamically from requirements.txt
-dependencies = []
+dependencies = [
+    "pytest",
+    "moto",
+    "pydantic",
+    "boto3"]
 
 keywords = ["aws", "s3", "s3_lifecycle_delta", "delta lake"]
 classifiers = [
@@ -24,7 +28,7 @@ classifiers = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["s3_lifecycle_delta"]
+where = ["."]
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.yaml"]
