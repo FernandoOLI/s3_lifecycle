@@ -3,25 +3,35 @@
 import json
 from typing import Optional
 import boto3
+import botocore
 
 from .policy import LifecyclePolicy
 from .diff import DiffResult, RuleChange
 from .validators import validate_policy
-from .exceptions import ApplyError, DiffError
+from .exceptions import ApplyError, DiffError, FetchError
 
 
 class LifecycleManager:
-    def __init__(self, s3_client: Optional[boto3.client] = None):
-        self.s3 = s3_client or boto3.client("s3")
+    def __init__(self, client=None):
+        self.client = client or boto3.client("s3")
 
-    def fetch_current(self, bucket_name: str) -> LifecyclePolicy:
+    def _get_current_policy(self, bucket: str) -> dict:
         try:
-            resp = self.s3.get_bucket_lifecycle_configuration(Bucket=bucket_name)
-            return LifecyclePolicy.from_dict({"Rules": resp.get("Rules", [])})
-        except self.s3.exceptions.NoSuchLifecycleConfiguration:
-            return LifecyclePolicy(Rules=[])
-        except Exception as e:
-            raise ApplyError(f"failed to fetch current lifecycle: {e}") from e
+            return self.client.get_bucket_lifecycle_configuration(Bucket=bucket)
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "NoSuchLifecycleConfiguration":
+                # No lifecycle set yet → treat as empty
+                return {"Rules": []}
+            elif error_code == "NoSuchBucket":
+                raise FetchError(f"Bucket '{bucket}' does not exist", details=e.response)
+            else:
+                raise FetchError("Failed to fetch lifecycle configuration", details=e.response)
+
+    def fetch_current(self, bucket: str) -> LifecyclePolicy:
+        """Public method to fetch current lifecycle as LifecyclePolicy."""
+        data = self._get_current_policy(bucket)
+        return LifecyclePolicy.from_dict(data)
 
     @staticmethod
     def _normalize_dict(d: dict) -> dict:
@@ -57,12 +67,16 @@ class LifecycleManager:
         return DiffResult(rule_change)
 
     def apply_delta(
-        self,
-        bucket_name: str,
-        delta: DiffResult,
-        desired_policy: LifecyclePolicy,
-        dry_run: bool = True
+            self,
+            bucket_name: str,
+            delta: DiffResult,
+            desired_policy: LifecyclePolicy,
+            dry_run: bool = True
     ) -> None:
+        """
+        Apply the lifecycle delta to the bucket.
+        Automatically removes None values to comply with boto3 parameter validation.
+        """
         validate_policy(desired_policy)
         summary = delta.summary()
         print(f"[apply_delta] Delta summary: {summary}")
@@ -70,10 +84,27 @@ class LifecycleManager:
             print("[apply_delta] Dry-run mode; not applying changes.")
             return
 
+        def _sanitize_policy_for_boto3(policy_dict: dict) -> dict:
+            """Remove None fields from policy dict that boto3 does not accept."""
+            clean = {"Rules": []}
+            for rule in policy_dict.get("Rules", []):
+                clean_rule = {k: v for k, v in rule.items() if v is not None}
+                if "Transitions" in clean_rule:
+                    clean_rule["Transitions"] = [
+                        {k: v for k, v in t.items() if v is not None}
+                        for t in clean_rule["Transitions"]
+                    ]
+                if "Expiration" in clean_rule and clean_rule["Expiration"] is None:
+                    del clean_rule["Expiration"]
+                clean["Rules"].append(clean_rule)
+            return clean
+
         try:
-            self.s3.put_bucket_lifecycle_configuration(
+            clean_policy = _sanitize_policy_for_boto3(desired_policy.dict())
+            self.client.put_bucket_lifecycle_configuration(
                 Bucket=bucket_name,
-                LifecycleConfiguration=desired_policy.dict()
+                LifecycleConfiguration=clean_policy
             )
+            print(f"[apply_delta] Lifecycle policy successfully applied to '{bucket_name}'")
         except Exception as e:
             raise ApplyError(f"Failed to apply lifecycle policy: {e}") from e
