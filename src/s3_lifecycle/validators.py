@@ -1,12 +1,10 @@
-# s3_lifecycle_delta/validators.py
-
 from .policy import LifecyclePolicy
 from .exceptions import ValidationError
 
 
 def validate_policy(policy: LifecyclePolicy) -> None:
     """
-    Validates the s3_lifecycle_delta policy according to AWS constraints.
+    Validates the s3_lifecycle policy according to AWS constraints.
     Raises ValidationError if invalid.
     """
     for rule in policy.Rules:

@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '**'
-      - '.github/workflows/s3_lifecycle_delta.yml'
+      - '.github/workflows/s3_lifecycle.yml'
     branches: [main]
 
 jobs:

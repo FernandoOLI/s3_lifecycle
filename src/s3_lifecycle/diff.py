@@ -1,9 +1,6 @@
-# s3_lifecycle_delta/diff.py
-
 from typing import List, Dict, Any
 from .policy import Rule
 from dataclasses import dataclass
-import copy
 
 
 @dataclass

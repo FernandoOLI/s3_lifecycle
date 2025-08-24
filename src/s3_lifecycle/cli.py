@@ -15,9 +15,8 @@ def main():
 
     desired = LifecyclePolicy.from_dict(policy_dict)
     manager = LifecycleManager()
-    delta = manager.compute_delta(args.bucket, desired)
-    print(delta.summary())
-    manager.apply_delta(args.bucket, delta, desired, dry_run=not args.apply)
+    delta = manager.compute(args.bucket, desired)
+    manager.apply(args.bucket, delta, desired, dry_run=not args.apply)
 
 if __name__ == "__main__":
     main()
