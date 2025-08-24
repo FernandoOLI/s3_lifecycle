@@ -1,0 +1,5 @@
+pytest
+moto
+pydantic
+boto3>=1.28.0
+botocore
