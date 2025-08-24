@@ -1,9 +1,9 @@
-from s3_lifecycle_delta.policy import LifecyclePolicy
-from s3_lifecycle_delta.manager import LifecycleManager
+from src.s3_lifecycle_delta.policy import LifecyclePolicy
+from src.s3_lifecycle_delta import LifecycleManager
 
 class DummyManager(LifecycleManager):
     def __init__(self, current_policy_dict):
-        super().__init__(s3_client=None)
+        super().__init__()
         self._current = LifecyclePolicy.from_dict(current_policy_dict)
 
     def fetch_current(self, bucket_name: str):
