@@ -1,5 +1,5 @@
-from src.s3_lifecycle_delta.policy import LifecyclePolicy
-from src.s3_lifecycle_delta import LifecycleManager
+from src.s3_lifecycle.policy import LifecyclePolicy
+from src.s3_lifecycle import LifecycleManager
 
 class DummyManager(LifecycleManager):
     def __init__(self, current_policy_dict):
@@ -21,7 +21,7 @@ def test_diff_no_change():
         ]
     }
     mgr = DummyManager(desired)
-    delta = mgr.compute_delta("bucket", LifecyclePolicy.from_dict(desired))
+    delta = mgr.compute("bucket", LifecyclePolicy.from_dict(desired))
     assert delta.summary() == "No changes"
 
 def test_diff_add_rule():
@@ -37,7 +37,7 @@ def test_diff_add_rule():
         ]
     }
     mgr = DummyManager(current)
-    delta = mgr.compute_delta("bucket", LifecyclePolicy.from_dict(desired))
+    delta = mgr.compute("bucket", LifecyclePolicy.from_dict(desired))
     assert "Add 1 rule" in delta.summary()
 
 def test_diff_update_rule():
@@ -62,7 +62,7 @@ def test_diff_update_rule():
         ]
     }
     mgr = DummyManager(current)
-    delta = mgr.compute_delta("bucket", LifecyclePolicy.from_dict(desired))
+    delta = mgr.compute("bucket", LifecyclePolicy.from_dict(desired))
     assert "Update 1 rule" in delta.summary()
 
 def test_diff_delete_rule():
@@ -78,5 +78,5 @@ def test_diff_delete_rule():
     }
     desired = {"Rules": []}
     mgr = DummyManager(current)
-    delta = mgr.compute_delta("bucket", LifecyclePolicy.from_dict(desired))
+    delta = mgr.compute("bucket", LifecyclePolicy.from_dict(desired))
     assert "Delete 1 rule" in delta.summary()

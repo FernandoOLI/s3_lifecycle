@@ -1,7 +1,4 @@
-# s3_lifecycle_delta/manager.py
-
 import json
-from typing import Optional
 import boto3
 import botocore
 
@@ -37,7 +34,7 @@ class LifecycleManager:
     def _normalize_dict(d: dict) -> dict:
         return json.loads(json.dumps(d, sort_keys=True))
 
-    def compute_delta(self, bucket_name: str, desired_policy: LifecyclePolicy) -> DiffResult:
+    def compute(self, bucket_name: str, desired_policy: LifecyclePolicy) -> DiffResult:
         try:
             current = self.fetch_current(bucket_name)
         except Exception as e:
@@ -66,7 +63,7 @@ class LifecycleManager:
         rule_change = RuleChange(to_add=to_add, to_update=to_update, to_delete=to_delete)
         return DiffResult(rule_change)
 
-    def apply_delta(
+    def apply(
             self,
             bucket_name: str,
             delta: DiffResult,
@@ -78,10 +75,8 @@ class LifecycleManager:
         Automatically removes None values to comply with boto3 parameter validation.
         """
         validate_policy(desired_policy)
-        summary = delta.summary()
-        print(f"[apply_delta] Delta summary: {summary}")
+        # If you can try before
         if dry_run:
-            print("[apply_delta] Dry-run mode; not applying changes.")
             return
 
         def _sanitize_policy_for_boto3(policy_dict: dict) -> dict:
@@ -105,6 +100,5 @@ class LifecycleManager:
                 Bucket=bucket_name,
                 LifecycleConfiguration=clean_policy
             )
-            print(f"[apply_delta] Lifecycle policy successfully applied to '{bucket_name}'")
         except Exception as e:
             raise ApplyError(f"Failed to apply lifecycle policy: {e}") from e

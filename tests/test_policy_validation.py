@@ -1,6 +1,6 @@
 import pytest
-from src.s3_lifecycle_delta.policy import LifecyclePolicy
-from src.s3_lifecycle_delta.validators import validate_policy
+from src.s3_lifecycle.policy import LifecyclePolicy
+from src.s3_lifecycle.validators import validate_policy
 from pydantic import ValidationError as PydanticValidationError
 
 def test_valid_transition_days_pass():

@@ -1,5 +1,3 @@
-# s3_lifecycle_delta/policy.py
-
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, model_validator
 

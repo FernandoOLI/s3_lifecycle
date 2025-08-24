@@ -1,7 +1,7 @@
 from typing import Any
 
 class LifecycleError(Exception):
-    """Base exception for s3_lifecycle_delta policy errors."""
+    """Base exception for s3_lifecycle policy errors."""
     def __init__(self, message: str = None, *, details: dict[str, Any] | None = None):
         super().__init__(message)
         self.details = details or {}
@@ -12,7 +12,7 @@ class LifecycleError(Exception):
 
 
 class ValidationError(LifecycleError):
-    """Raised when s3_lifecycle_delta policy validation fails."""
+    """Raised when s3_lifecycle policy validation fails."""
     pass
 
 
@@ -22,7 +22,7 @@ class DiffError(LifecycleError):
 
 
 class ApplyError(LifecycleError):
-    """Raised when applying s3_lifecycle_delta policy to S3 fails."""
+    """Raised when applying s3_lifecycle policy to S3 fails."""
     pass
 
 

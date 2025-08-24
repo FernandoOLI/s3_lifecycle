@@ -20,7 +20,7 @@ dependencies = [
     "pydantic",
     "boto3"]
 
-keywords = ["aws", "s3", "s3_lifecycle_delta", "delta lake"]
+keywords = ["aws", "s3", "s3_lifecycle"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
