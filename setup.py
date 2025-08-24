@@ -19,7 +19,7 @@ setup(
     description="A small Python library to compute and apply deltas on AWS S3 lifecycle",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/your-library",
+    url="https://github.com/FernandoOLI/s3_lifecycle",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
