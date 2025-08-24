@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
+
 def parse_requirements(filename):
     with open(Path(__file__).parent / filename, encoding="utf-8") as f:
         return [
@@ -8,6 +9,7 @@ def parse_requirements(filename):
             for line in f
             if line.strip() and not line.startswith("#")
         ]
+
 
 setup(
     name="s3-lifecycle-delta",
@@ -25,6 +27,12 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=[
+        "pytest",
+        "moto",
+        "pydantic",
+        "boto3",
+        "botocore"
+    ],
     python_requires=">=3.6",
-    install_requires=parse_requirements("requirements.txt"),
 )

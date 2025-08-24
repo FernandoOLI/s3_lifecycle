@@ -13,6 +13,8 @@ This library:
 - Validates rules
 - Applies only the intended change safely
 
+---
+
 ## Features
 
 - Declarative lifecycle policy definitions (via Python / JSON)
@@ -22,11 +24,126 @@ This library:
 - Idempotent behavior
 - Pluggable for custom validation or rule logic
 
+---
+
 ## Quickstart
 
-### Install (editable for dev)
+### 1. Set Up AWS Environment
+
+Before using `s3-lifecycle-delta`, configure AWS credentials.
+
+#### a) Using AWS CLI
 
 ```bash
-git clone https://github.com/your-org/s3-lifecycle-delta.git
+aws configure
+````
+
+Provide:
+
+```
+AWS Access Key ID [None]: <YOUR_ACCESS_KEY>
+AWS Secret Access Key [None]: <YOUR_SECRET_KEY>
+Default region name [None]: <YOUR_DEFAULT_REGION>  # e.g., us-east-1
+Default output format [None]: json
+```
+
+#### b) Using environment variables
+
+**Linux/macOS:**
+
+```bash
+export AWS_ACCESS_KEY_ID=<YOUR_ACCESS_KEY>
+export AWS_SECRET_ACCESS_KEY=<YOUR_SECRET_KEY>
+export AWS_DEFAULT_REGION=us-east-1
+```
+
+**Windows (PowerShell):**
+
+```powershell
+setx AWS_ACCESS_KEY_ID "<YOUR_ACCESS_KEY>"
+setx AWS_SECRET_ACCESS_KEY "<YOUR_SECRET_KEY>"
+setx AWS_DEFAULT_REGION "us-east-1"
+```
+
+> ⚠️ Ensure your IAM user has `s3:GetLifecycleConfiguration` and `s3:PutLifecycleConfiguration` permissions.
+
+---
+
+### 2. Install the Library
+
+```bash
+git clone https://github.com/FernandoOLI/s3-lifecycle-delta.git
 cd s3-lifecycle-delta
 pip install -e .
+```
+
+---
+
+### 3. Basic Usage
+
+```python
+from s3_lifecycle import S3LifecycleManager
+
+manager = S3LifecycleManager(bucket_name="my-bucket")
+
+desired_policy = {
+    "Rules": [
+        {
+            "ID": "transition-to-glacier-and-deep",
+            "Filter": {"Prefix": "logs/"},
+            "Status": "Enabled",
+            "Transitions": [
+                {"Days": 90, "StorageClass": "GLACIER"},
+                {"Days": 190, "StorageClass": "DEEP_ARCHIVE"}
+            ]
+        },
+        {
+            "ID": "transition-to-glacier-and-deep",
+            "Filter": {"Prefix": "data/"},
+            "Status": "Enabled",
+            "Transitions": [
+                {"Days": 120, "StorageClass": "GLACIER"},
+                {"Days": 300, "StorageClass": "DEEP_ARCHIVE"}
+            ],
+            "NoncurrentVersionTransitions": [
+                {"Days": 120, "StorageClass": "GLACIER"},
+                {"Days": 300, "StorageClass": "DEEP_ARCHIVE"}
+            ],
+            "Expiration": [
+                {"Days": 500}
+            ]
+        }
+    ]
+}
+
+# Compute delta and preview changes
+delta = manager.compute(desired_policy)
+manager.show_changes(delta)  # Dry-run preview
+
+# Apply changes safely
+manager.apply(delta, dry_run=True)  # Set dry_run=False to apply
+```
+
+---
+
+### 4. Notes
+
+* `dry_run=True` only prints changes; no modifications are applied.
+* Always validate IAM permissions before running `apply`.
+* Supports declarative JSON/Python policy definitions for safe incremental updates.
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Make your changes
+4. Run tests and ensure coverage
+5. Submit a Pull Request
+
+---
+
+## License
+
+MIT License
