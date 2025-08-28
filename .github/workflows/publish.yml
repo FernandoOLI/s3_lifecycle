@@ -35,12 +35,7 @@ jobs:
           echo "Using dev version: $DEV_VERSION"
 
       - name: Build package
-        run: |
-          if [[ "$GITHUB_REF" == "refs/heads/develop" ]]; then
-            python -m build --sdist --wheel --outdir dist
-          else
-            python -m build --sdist --wheel --outdir dist
-          fi
+        run: python -m build --sdist --wheel --outdir dist
 
       - name: Publish to TestPyPI
         if: github.ref == 'refs/heads/develop'
@@ -57,7 +52,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml','rb'))['project']['version'])")
-          echo "Version: $VERSION"
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git tag "v$VERSION"
