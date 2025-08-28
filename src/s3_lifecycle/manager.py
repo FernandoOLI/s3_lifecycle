@@ -37,6 +37,7 @@ class LifecycleManager:
     def compute(self, bucket_name: str, desired_policy: LifecyclePolicy) -> DiffResult:
         try:
             current = self.fetch_current(bucket_name)
+            print(current)
         except Exception as e:
             raise DiffError(f"Failed to fetch current lifecycle for diff: {e}") from e
 
