@@ -89,13 +89,18 @@ manager = S3LifecycleManager(bucket_name="my-bucket")
 desired_policy = {
     "Rules": [
         {
-            "ID": "transition-to-glacier-and-deep",
+            "ID": "archive-log",
             "Filter": {"Prefix": "logs/"},
             "Status": "Enabled",
-            "Transitions": [
-                {"Days": 90, "StorageClass": "GLACIER"},
-                {"Days": 190, "StorageClass": "DEEP_ARCHIVE"}
-            ]
+            "Transitions": [{"Days": 300, "StorageClass": "GLACIER"},
+                            {"Days": 390, "StorageClass": "DEEP_ARCHIVE"}
+                            ],
+            "Expiration": {'Days': 500},
+            "NoncurrentVersionTransitions": [
+                {"NoncurrentDays": 30, "StorageClass": "GLACIER"},
+                {"NoncurrentDays": 150, "StorageClass": "DEEP_ARCHIVE"}
+            ],
+            "NoncurrentVersionExpiration": {'NoncurrentDays': 700}
         },
         {
             "ID": "transition-to-glacier-and-deep",
@@ -108,9 +113,6 @@ desired_policy = {
             "NoncurrentVersionTransitions": [
                 {"Days": 120, "StorageClass": "GLACIER"},
                 {"Days": 300, "StorageClass": "DEEP_ARCHIVE"}
-            ],
-            "Expiration": [
-                {"Days": 500}
             ]
         }
     ]
