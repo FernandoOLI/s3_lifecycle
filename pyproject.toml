@@ -5,20 +5,22 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "s3-lifecycle"
 version = "0.1.1"
-description = "A Python library to manage S3 lifecycle policies and track changes in Delta format."
+description = "A Python library to manage S3 lifecycle policies."
 authors = [
     { name = "Fernando Oliveira Pereira", email = "oliveira-fernando1@hotmail.com" }
 ]
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.9"
 
 dependencies = [
-    "pytest",
-    "moto",
     "pydantic",
     "boto3",
-    "botocore"]
+    "botocore"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "moto"]
 
 keywords = ["aws", "s3", "s3_lifecycle"]
 classifiers = [
@@ -26,11 +28,53 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
+
 [project.urls]
 Homepage = "https://github.com/FernandoOLI/s3_lifecycle"
 Issues = "https://github.com/FernandoOLI/s3_lifecycle/issues"
+
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 
 [tool.setuptools.package-data]
-"*" = ["*.json", "*.yaml"]
+"s3_lifecycle" = ["*.json", "*.yaml"]
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "s3-lifecycle"
+version = "0.1.2"
+description = "A Python library to manage S3 lifecycle policies."
+authors = [
+    { name = "Fernando Oliveira Pereira", email = "oliveira-fernando1@hotmail.com" }
+]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+
+dependencies = [
+    "pydantic",
+    "boto3",
+    "botocore"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "moto"]
+
+keywords = ["aws", "s3", "s3_lifecycle"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/FernandoOLI/s3_lifecycle"
+Issues = "https://github.com/FernandoOLI/s3_lifecycle/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"s3_lifecycle" = ["*.json", "*.yaml"]
