@@ -8,7 +8,7 @@ with open("pyproject.toml", "rb") as f:
     pyproject = tomli.load(f)
     version = pyproject["project"]["version"]
 
-# Override version if DEV_VERSION is set in GitHub Actions
+# Override version if DEV_VERSION is set (for GitHub Actions)
 dev_version = os.getenv("DEV_VERSION")
 if dev_version:
     version = dev_version
@@ -28,11 +28,6 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ],
-    install_requires=[
-        "pydantic",
-        "boto3",
-        "botocore"
     ],
     python_requires=">=3.9",
 )
