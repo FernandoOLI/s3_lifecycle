@@ -77,6 +77,7 @@ class LifecycleManager:
         validate_policy(desired_policy)
         # If you can try before
         if dry_run:
+            print(f"Dry-run mode: would apply {delta.summary()} to bucket '{bucket_name}'")
             return
 
         def _sanitize_policy_for_boto3(policy_dict: dict) -> dict:
