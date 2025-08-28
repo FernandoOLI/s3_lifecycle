@@ -13,7 +13,7 @@ def parse_requirements(filename):
 
 setup(
     name="s3-lifecycle",
-    version="0.1.1",
+    version="0.1.2",
     packages=find_packages(where="."),
     package_dir={"": "."},
     author="Fernando Oliveira Pereira",

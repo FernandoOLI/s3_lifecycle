@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "s3-lifecycle"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Python library to manage S3 lifecycle policies"
 authors = [
     { name = "Fernando Oliveira Pereira", email = "oliveira-fernando1@hotmail.com" }
