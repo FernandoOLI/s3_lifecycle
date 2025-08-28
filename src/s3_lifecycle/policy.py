@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from pydantic import BaseModel, model_validator
 
 
@@ -19,6 +19,10 @@ class NoncurrentVersionTransition(BaseModel):
     StorageClass: str
 
 
+class NoncurrentVersionExpiration(BaseModel):
+    NoncurrentDays: int
+
+
 class Expiration(BaseModel):
     Days: Optional[int] = None
     Date: Optional[str] = None
@@ -33,18 +37,18 @@ class Rule(BaseModel):
     ID: str
     Filter: Dict[str, Any]
     Status: str
-    Transitions: Optional[List[Transition]] = None
-    Expiration: Optional[Expiration] = None
-    NoncurrentVersionTransitions: Optional[List[NoncurrentVersionTransition]] = None
-    NoncurrentVersionExpiration: Optional[Expiration] = None
+    Transitions: Optional[List[Union[Transition, Dict[str, Any]]]] = None
+    Expiration: Optional[Union[Expiration, Dict[str, Any]]] = None
+    NoncurrentVersionTransitions: Optional[List[Union[NoncurrentVersionTransition, Dict[str, Any]]]] = None
+    NoncurrentVersionExpiration: Optional[Union[NoncurrentVersionExpiration, Dict[str, Any]]] = None
 
     @model_validator(mode="after")
     def check_rule_not_empty(self):
         if (
-            not self.Transitions
-            and not self.Expiration
-            and not self.NoncurrentVersionTransitions
-            and not self.NoncurrentVersionExpiration
+                not self.Transitions
+                and not self.Expiration
+                and not self.NoncurrentVersionTransitions
+                and not self.NoncurrentVersionExpiration
         ):
             raise ValueError(
                 f"Rule '{self.ID}' must have at least one of: Transitions, Expiration, "
