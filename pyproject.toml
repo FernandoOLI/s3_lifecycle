@@ -4,42 +4,33 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "s3-lifecycle"
-version = "0.1.2"
-description = "A Python library to manage S3 lifecycle policies."
+version = "0.1.1"
+description = "A Python library to manage S3 lifecycle policies"
 authors = [
     { name = "Fernando Oliveira Pereira", email = "oliveira-fernando1@hotmail.com" }
 ]
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
 requires-python = ">=3.9"
 
-# Base dependencies for all installations
 dependencies = [
+    "pytest",
+    "moto",
     "pydantic",
     "boto3",
-    "botocore"
-]
+    "botocore"]
 
-
-
-# Metadata
 keywords = ["aws", "s3", "s3_lifecycle"]
-
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
-
 [project.urls]
 Homepage = "https://github.com/FernandoOLI/s3_lifecycle"
 Issues = "https://github.com/FernandoOLI/s3_lifecycle/issues"
-# Optional dependencies for development/testing
-[project.optional-dependencies]
-dev = ["pytest", "moto"]
-# setuptools-specific configuration
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.setuptools.package-data]
-"s3_lifecycle" = ["*.json", "*.yaml"]
+"*" = ["*.json", "*.yaml"]
