@@ -20,9 +20,7 @@ dependencies = [
     "botocore"
 ]
 
-# Optional dependencies for development/testing
-[project.optional-dependencies]
-dev = ["pytest", "moto"]
+
 
 # Metadata
 keywords = ["aws", "s3", "s3_lifecycle"]
@@ -36,7 +34,9 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/FernandoOLI/s3_lifecycle"
 Issues = "https://github.com/FernandoOLI/s3_lifecycle/issues"
-
+# Optional dependencies for development/testing
+[project.optional-dependencies]
+dev = ["pytest", "moto"]
 # setuptools-specific configuration
 [tool.setuptools.packages.find]
 where = ["src"]
