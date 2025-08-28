@@ -12,13 +12,13 @@ def parse_requirements(filename):
 
 
 setup(
-    name="s3-lifecycle-delta",
+    name="s3-lifecycle",
     version="0.1.1",
     packages=find_packages(where="."),
     package_dir={"": "."},
     author="Fernando Oliveira Pereira",
     author_email="oliveira-fernando1@hotmail.com",
-    description="A small Python library to compute and apply deltas on AWS S3 lifecycle",
+    description="A small Python library to compute and apply bucket policies on AWS S3 lifecycle",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/FernandoOLI/s3_lifecycle",
