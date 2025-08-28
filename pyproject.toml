@@ -13,16 +13,20 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 
+# Base dependencies for all installations
 dependencies = [
     "pydantic",
     "boto3",
     "botocore"
 ]
 
+# Optional dependencies for development/testing
 [project.optional-dependencies]
 dev = ["pytest", "moto"]
 
+# Metadata
 keywords = ["aws", "s3", "s3_lifecycle"]
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -33,6 +37,7 @@ classifiers = [
 Homepage = "https://github.com/FernandoOLI/s3_lifecycle"
 Issues = "https://github.com/FernandoOLI/s3_lifecycle/issues"
 
+# setuptools-specific configuration
 [tool.setuptools.packages.find]
 where = ["src"]
 
