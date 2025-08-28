@@ -1,24 +1,26 @@
 from setuptools import setup, find_packages
 from pathlib import Path
+import tomli
+import os
 
+# Read base version from pyproject.toml
+with open("pyproject.toml", "rb") as f:
+    pyproject = tomli.load(f)
+    version = pyproject["project"]["version"]
 
-def parse_requirements(filename):
-    with open(Path(__file__).parent / filename, encoding="utf-8") as f:
-        return [
-            line.strip()
-            for line in f
-            if line.strip() and not line.startswith("#")
-        ]
-
+# Override version if DEV_VERSION is set in GitHub Actions
+dev_version = os.getenv("DEV_VERSION")
+if dev_version:
+    version = dev_version
 
 setup(
-    name="s3-lifecycle-delta",
-    version="0.1.1",
-    packages=find_packages(where="."),
-    package_dir={"": "."},
+    name="s3-lifecycle",
+    version=version,
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     author="Fernando Oliveira Pereira",
     author_email="oliveira-fernando1@hotmail.com",
-    description="A small Python library to compute and apply deltas on AWS S3 lifecycle",
+    description="A small Python library to compute and apply policies on AWS S3 lifecycle",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/FernandoOLI/s3_lifecycle",
@@ -28,11 +30,9 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "pytest",
-        "moto",
         "pydantic",
         "boto3",
         "botocore"
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.9",
 )

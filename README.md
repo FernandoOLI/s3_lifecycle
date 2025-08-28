@@ -1,14 +1,21 @@
-# s3-lifecycle-delta
 
-A small Python library to **compute and apply deltas** on AWS S3 lifecycle policies—especially focused on safe, declarative **storage class transitions**—with dry-run, validation, and minimal disruption.
+# s3-lifecycle
+
+![PyPI](https://img.shields.io/pypi/v/s3-lifecycle?label=PyPI&color=blue)
+![TestPyPI](https://img.shields.io/badge/TestPyPI-v0.1.1-orange)
+
+A small Python library to **compute and apply policies** on AWS S3 lifecycle policies—especially focused on safe, declarative **storage class transitions**—with dry-run, validation, and minimal disruption.
+
+---
 
 ## Problem
 
 AWS S3 lifecycle policies are typically applied by overwriting the entire configuration. That makes automated changes brittle, error-prone, and risky when you only want to tweak transitions (e.g., change from `STANDARD` → `GLACIER` after 90 days) without accidentally deleting other rules.
 
 This library:
+
 - Introspects the current lifecycle policy
-- Compares it to the desired policy (the "delta")
+- Compares it to the desired policy
 - Shows what would change (dry-run)
 - Validates rules
 - Applies only the intended change safely
@@ -30,13 +37,13 @@ This library:
 
 ### 1. Set Up AWS Environment
 
-Before using `s3-lifecycle-delta`, configure AWS credentials.
+Before using `s3-lifecycle`, configure AWS credentials.
 
 #### a) Using AWS CLI
 
 ```bash
 aws configure
-````
+```
 
 Provide:
 
@@ -72,8 +79,8 @@ setx AWS_DEFAULT_REGION "us-east-1"
 ### 2. Install the Library
 
 ```bash
-git clone https://github.com/FernandoOLI/s3-lifecycle-delta.git
-cd s3-lifecycle-delta
+git clone https://github.com/FernandoOLI/s3-lifecycle.git
+cd s3-lifecycle
 pip install -e .
 ```
 
@@ -82,67 +89,74 @@ pip install -e .
 ### 3. Basic Usage
 
 ```python
-from s3_lifecycle import S3LifecycleManager
+from s3_lifecycle import LifecyclePolicy, LifecycleManager, validate_policy, ValidationError, ApplyError
 
-manager = S3LifecycleManager(bucket_name="my-bucket")
-
-desired_policy = {
+# Example lifecycle policy dictionary
+desired_policy_dict = {
     "Rules": [
         {
             "ID": "archive-log",
             "Filter": {"Prefix": "logs/"},
             "Status": "Enabled",
-            "Transitions": [{"Days": 300, "StorageClass": "GLACIER"},
-                            {"Days": 390, "StorageClass": "DEEP_ARCHIVE"}
-                            ],
+            "Transitions": [
+                {"Days": 300, "StorageClass": "GLACIER"},
+                {"Days": 390, "StorageClass": "DEEP_ARCHIVE"}
+            ],
             "Expiration": {'Days': 500},
             "NoncurrentVersionTransitions": [
                 {"NoncurrentDays": 30, "StorageClass": "GLACIER"},
                 {"NoncurrentDays": 150, "StorageClass": "DEEP_ARCHIVE"}
             ],
             "NoncurrentVersionExpiration": {'NoncurrentDays': 700}
-        },
-        {
-            "ID": "transition-to-glacier-and-deep",
-            "Filter": {"Prefix": "data/"},
-            "Status": "Enabled",
-            "Transitions": [
-                {"Days": 120, "StorageClass": "GLACIER"},
-                {"Days": 300, "StorageClass": "DEEP_ARCHIVE"}
-            ],
-            "NoncurrentVersionTransitions": [
-                {"Days": 120, "StorageClass": "GLACIER"},
-                {"Days": 300, "StorageClass": "DEEP_ARCHIVE"}
-            ]
         }
     ]
 }
 
-# Compute delta and preview changes
-delta = manager.compute(desired_policy)
-manager.show_changes(delta)  # Dry-run preview
+def main():
+    try:
+        # Create and validate policy
+        policy = LifecyclePolicy.from_dict(desired_policy_dict)
+        validate_policy(policy)
 
-# Apply changes safely
-manager.apply(delta, dry_run=True)  # Set dry_run=False to apply
+        bucket = "lifecycle-management-bucket"
+
+        # Initialize manager (will create boto3 client if not passed)
+        manager = LifecycleManager()
+
+        # Compute input vs current S3 bucket policy
+        diff_result = manager.compute(bucket, policy)
+
+        # Apply changes safely (dry_run=True prints summary only)
+        manager.apply(bucket, diff_result, policy, dry_run=True)
+
+    except ValidationError as ve:
+        print(f"Policy validation error: {ve}, details: {ve.details}")
+    except ApplyError as ae:
+        print(f"Failed to apply lifecycle policy: {ae}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+if __name__ == "__main__":
+    main()
 ```
 
 ---
 
 ### 4. Notes
 
-* `dry_run=True` only prints changes; no modifications are applied.
-* Always validate IAM permissions before running `apply`.
-* Supports declarative JSON/Python policy definitions for safe incremental updates.
+- `dry_run=True` only prints changes; no modifications are applied.  
+- Always validate IAM permissions before running `apply`.  
+- Supports declarative JSON/Python policy definitions for safe incremental updates.
 
 ---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Make your changes
-4. Run tests and ensure coverage
-5. Submit a Pull Request
+1. Fork the repository  
+2. Create a feature branch (`git checkout -b feature/my-feature`)  
+3. Make your changes  
+4. Run tests and ensure coverage  
+5. Submit a Pull Request  
 
 ---
 
